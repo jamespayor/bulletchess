@@ -14,17 +14,17 @@ move_stack_t *initialize_move_stack(u_int64_t capacity){
 }
 
 
-// Pushes an undoable move to the move stack, growing the stack's 
+// Pushes an undoable move to the move stack, growing the stack's
 // capacity if needed, and increasing the length by 1
 void push_move(move_stack_t *stack, undoable_move_t move){
   #define GROW_STACK 5
   if (stack) {
     if (stack->capacity >= stack->length) {
       u_int16_t new_capacity = stack->capacity * GROW_STACK;
-      undoable_move_t *new_values = malloc(sizeof(undoable_move_t) * new_capacity); 
+      undoable_move_t *new_values = malloc(sizeof(undoable_move_t) * new_capacity);
       stack->capacity = new_capacity;
       memcpy(new_values, stack->values, sizeof(undoable_move_t) * stack->length);
-      stack->values = new_values; 
+      stack->values = new_values;
     }
     stack->values[stack->length] = move;
     stack->length += 1;
@@ -74,12 +74,12 @@ piece_t get_piece_at_bb(position_t * board, bitboard_t square_bb);
 #define TEXT_COLOR "\x1B[38;5;%dm"
 #define BKG_COLOR "\x1B[48;5;%dm"
 
-void unicode_write_board(full_board_t *board, char *buffer, 
+void unicode_write_board(full_board_t *board, char *buffer,
 		u_int8_t text_color,
 		u_int8_t light_color,
 		u_int8_t dark_color,
 		u_int8_t select_color,
-		bitboard_t select_bb, 
+		bitboard_t select_bb,
 		bitboard_t target_bb) {
 		int str_i = sprintf(buffer, TEXT_COLOR, text_color);
 		int i = 0;
@@ -87,26 +87,26 @@ void unicode_write_board(full_board_t *board, char *buffer,
         int j = 0;
         for (bitboard_t file = FILE_A; j < 8; j++) {
 					bitboard_t sq_bb = rank & file;
-					piece_t p = get_piece_at_bb(board->position, sq_bb);	
-					
+					piece_t p = get_piece_at_bb(board->position, sq_bb);
+
 					int color;
 					if (sq_bb & select_bb) color = select_color;
 					else color = sq_bb & LIGHT_SQ_BB ? light_color : dark_color;
-					str_i += sprintf(buffer + str_i, BKG_COLOR, color); 
-					
+					str_i += sprintf(buffer + str_i, BKG_COLOR, color);
+
 					if (sq_bb & select_bb) str_i += sprintf(buffer + str_i, "\x1B[5;23m");
-					else str_i += sprintf(buffer + str_i, "\x1B[25m"); 
-					
+					else str_i += sprintf(buffer + str_i, "\x1B[25m");
+
 					str_i += sprintf(buffer + str_i, "%s", piece_unicode(p));
-					
-					if (sq_bb & target_bb) 
+
+					if (sq_bb & target_bb)
 						str_i += sprintf(buffer + str_i, DOT);
 					else buffer[str_i++] = ' ';
-			
+
 
 					file = SAFE_RIGHT_BB(file);
 				}
-				str_i += sprintf(buffer + str_i, "\x1B[49m"); 
+				str_i += sprintf(buffer + str_i, "\x1B[49m");
 				buffer[str_i++] = '\n';
         rank = BELOW_BB(rank);
     }
@@ -122,8 +122,8 @@ void str_write_board(full_board_t *board, char *buffer) {
         int j = 0;
         for (bitboard_t file = FILE_A; j < 8; j++) {
 					bitboard_t sq_bb = rank & file;
-					piece_t p = get_piece_at_bb(board->position, sq_bb);	
-					char c = piece_symbol(p);					
+					piece_t p = get_piece_at_bb(board->position, sq_bb);
+					char c = piece_symbol(p);
 					buffer[str_i++] = c;
 					buffer[str_i++] = ' ';
 					file = SAFE_RIGHT_BB(file);
@@ -217,14 +217,14 @@ u_int8_t count_piece_type(full_board_t * board, piece_type_t type) {
 		return count_bits(pos->kings);
 	}
 	return 0;
-}	
+}
 
 
 
 
 u_int8_t count_color(full_board_t * board, piece_color_t color) {
 	position_t *pos = board->position;
-	if (color == WHITE_VAL) return count_bits(pos->white_oc);	
+	if (color == WHITE_VAL) return count_bits(pos->white_oc);
 	else if (color == BLACK_VAL) return count_bits(pos->black_oc);
 	return 0;
 }
@@ -283,7 +283,7 @@ void delete_piece_at(position_t * board, square_t square) {
 
 
 void delete_piece_at_board(full_board_t * board, piece_index_t * array, square_t square) {
-	delete_piece_at(board->position, square); 
+	delete_piece_at(board->position, square);
 	if (array)
 		array[square] = EMPTY_INDEX;
 }
@@ -361,9 +361,9 @@ bool board_has_counts(full_board_t *board, piece_counts_t counts) {
 	       counts_match(counts.black_queens, to_check.black_queens);
 	return out;
 }
-u_int64_t filter_boards_from_counts(full_board_t **boards, 
+u_int64_t filter_boards_from_counts(full_board_t **boards,
 								u_int64_t in_length,
-								piece_counts_t counts, 
+								piece_counts_t counts,
 								full_board_t **out_list) {
 	u_int64_t out_length = 0;
 	for (u_int64_t i = 0; i < in_length; i++) {
@@ -451,7 +451,7 @@ void debug_equal(full_board_t *board1, full_board_t *board2) {
 		fprintf(stdout, "Castling rights do not match");
 	if (board1->turn != board2->turn)
 		fprintf(stdout, "Turns do not match");
-	if (!board1->position) 
+	if (!board1->position)
 		fprintf(stdout, "Pos1 is null");
 	if (!board2->position)
 		fprintf(stdout, "Pos2 is null");
@@ -467,23 +467,23 @@ void debug_equal(full_board_t *board1, full_board_t *board2) {
 		fprintf(stdout, "Kings mismatch");
 	optional_square_t ep1 = board1->en_passant_square;
   optional_square_t ep2 = board2->en_passant_square;
-	if (ep1.exists && !ep2.exists) 
+	if (ep1.exists && !ep2.exists)
 		fprintf(stdout, "EP1 exists but not ep2");
 	if (!ep1.exists && ep2.exists)
 		fprintf(stdout, "EP1 does not exists but EP2 does");
 	if (ep1.exists && ep2.exists)
 		if (ep1.square != ep2.square) fprintf(stdout, "eps mismatch");
-  
 
-	fprintf(stdout, "EQ WAS TESTED !!!!!!!!!!!!!!!!!!!!!!!!1\n\n\n");	
+
+	fprintf(stdout, "EQ WAS TESTED !!!!!!!!!!!!!!!!!!!!!!!!1\n\n\n");
 }
 */
 
 
 
 bool positions_equal(position_t *pos1, position_t *pos2){
-		return 
-        pos1 && pos2 && 
+		return
+        pos1 && pos2 &&
         pos1->black_oc == pos2->black_oc &&
         pos1->white_oc == pos2->white_oc &&
 				pos1->pawns == pos2->pawns &&
@@ -506,7 +506,7 @@ bool boards_legally_equal(full_board_t *board1, full_board_t *board2) {
         optional_square_t ep2 = board2->en_passant_square;
 				if (ep1.exists) {
             return ep2.exists && ep1.square == ep2.square;
-        } 
+        }
         return !ep2.exists;
     }
     return false;
@@ -529,7 +529,7 @@ bool board_has_pattern(full_board_t * board, piece_pattern_t pattern) {
 		case BITBOARD_PATTERN:
 	 	return piece_bb == pattern.bitboard;
 	}
-	return false;	
+	return false;
 }
 
 bool board_has_patterns(full_board_t *board, piece_pattern_t *patterns, u_int64_t pattern_count) {
@@ -550,7 +550,7 @@ u_int8_t squares_with_piece(full_board_t *board, piece_t piece, square_t *square
 		bitboard_t sq_bb = SQUARE_TO_BB(square);
 		if (sq_bb & piece_bb) {
 			square_buffer[count++] = square;
-		}		
+		}
 	}
 	return count;
 }
@@ -564,7 +564,7 @@ void copy_into(full_board_t * dst, full_board_t * source) {
     dst->en_passant_square = source->en_passant_square;
     dst->fullmove_number = source->fullmove_number;
     dst->halfmove_clock = source->halfmove_clock;
-    
+
 		dst->position->pawns = source->position->pawns;
     dst->position->knights = source->position->knights;
     dst->position->bishops = source->position->bishops;
@@ -577,7 +577,7 @@ void copy_into(full_board_t * dst, full_board_t * source) {
 
 /*
 bitboard_t bitboard_diff(full_board_t * board1, full_board_t * board2) {
-    bitboard_t xord = 
+    bitboard_t xord =
         (board1->position->knights ^ board1->position->knights) |
         (board1->position->bishops ^ board1->position->bishops) |
         (board1->position->rooks ^ board1->position->rooks) |
@@ -753,7 +753,7 @@ bool has_queenside_castling_rights(full_board_t* board, piece_color_t color) {
 
 bool has_castling_rights(full_board_t* board, piece_color_t color) {
     if (color == WHITE_VAL) {
-        return (board->castling_rights & WHITE_KINGSIDE) || 
+        return (board->castling_rights & WHITE_KINGSIDE) ||
         (board->castling_rights & WHITE_QUEENSIDE);
     }
     else {
@@ -829,7 +829,7 @@ char * set_ep_square_checked(full_board_t *board, square_t square) {
 	}
 	if (!on_3 && !on_6) {
 		return "Illegal en passant Square {ep}, must be on either rank 3 or rank 6";
-	}	
+	}
 	if (board->turn == WHITE_VAL) {
 			if (on_3) {
 				return "Illegal en passant Square {ep}, must be on rank 6 if it is white's turn";
@@ -838,7 +838,7 @@ char * set_ep_square_checked(full_board_t *board, square_t square) {
 				return "Illegal en passant Square {ep}, there is no corresponding black pawn";
 			}
 	}
-	else {	
+	else {
 			if (on_6) {
 				return "Illegal en passant Square {ep}, must be on rank 3 if it is black's turn";
 			}
@@ -846,7 +846,7 @@ char * set_ep_square_checked(full_board_t *board, square_t square) {
 				return "Illegal en passant Square {ep}, there is no corresponding white pawn";
 			}
 	}
-	set_ep_square(board, square);	
+	set_ep_square(board, square);
 	return 0;
 }
 
@@ -934,16 +934,16 @@ bool valid_castling(full_board_t *board, castling_rights_t castling){
 	// INVALID IF:
 	// - Color has castling rights and king has moved
 	// - Color has kingside and no rook on H1/H8
-	// - Color has queenside and no rook on A1/A8 
+	// - Color has queenside and no rook on A1/A8
 	castling_rights_t white_kingside = castling & WHITE_KINGSIDE;
 	castling_rights_t black_kingside = castling & BLACK_KINGSIDE;
 	castling_rights_t white_queenside = castling & WHITE_QUEENSIDE;
-	castling_rights_t black_queenside = castling & BLACK_QUEENSIDE;	
+	castling_rights_t black_queenside = castling & BLACK_QUEENSIDE;
 	position_t *pos = board->position;
 	return CASTLING_VALID(white, 1) && CASTLING_VALID(black, 8);
 	return true;
-}	
-	
+}
+
 
 
 // ridiculous function, dont know what i was thinking with this mess
@@ -966,7 +966,7 @@ char* validate_board(full_board_t * board) {
 		}
 		if (position->bishops & position->knights) {
 			return "Knight and bishops bitboard values are conflicting";
-		}	
+		}
 		if (position->rooks & position->queens) {
 			return "Rook and queen bitboard values are conflicting";
 		}
@@ -998,7 +998,7 @@ char* validate_board(full_board_t * board) {
             return "Board cannot have more than 1 black king";
     }
     bitboard_t white_pawns = position->white_oc & position->pawns;
-    bitboard_t black_pawns = position->black_oc & position->pawns; 
+    bitboard_t black_pawns = position->black_oc & position->pawns;
     u_int8_t white_pawn_count = count_bits(white_pawns);
 		u_int8_t black_pawn_count = count_bits(black_pawns);
 		if (white_pawn_count > 8){
@@ -1013,7 +1013,7 @@ char* validate_board(full_board_t * board) {
 		int8_t white_knight_count = count_bits(position->white_oc & position->knights);
 		if (white_bishop_count + white_pawn_count > 10) {
 			return "Board cannot have more white bishops than are able to promote";
-		}		
+		}
 		if (white_rook_count + white_pawn_count > 10) {
 			return "Board cannot have more white rooks than are able to promote";
 		}
@@ -1029,7 +1029,7 @@ char* validate_board(full_board_t * board) {
 		int8_t black_knight_count = count_bits(position->black_oc & position->knights);
 		if (black_bishop_count + black_pawn_count > 10) {
 			return "Board cannot have more black bishops than are able to promote";
-		}		
+		}
 		if (black_rook_count + black_pawn_count > 10) {
 			return "Board cannot have more black rooks than are able to promote";
 		}
@@ -1041,7 +1041,7 @@ char* validate_board(full_board_t * board) {
 		}
 
 		// TODO: We know bishops are promoted if there is another bishop of the same square color
-		// We also know that 7 pawns, 3 rooks, and 3 bishops and similiar cases are illegal 
+		// We also know that 7 pawns, 3 rooks, and 3 bishops and similiar cases are illegal
 
 		castling_rights_t rights = board->castling_rights;
     if (rights) {
@@ -1059,9 +1059,9 @@ char* validate_board(full_board_t * board) {
         if (black_rights && black_king_moved)
           return "Board castling rights are illegal, black cannot castle";
         bitboard_t not_white_rooks = ~(position->rooks & position->white_oc);
-        if (white_rights & WHITE_QUEENSIDE && not_white_rooks & SQUARE_TO_BB(A1))  
+        if (white_rights & WHITE_QUEENSIDE && not_white_rooks & SQUARE_TO_BB(A1))
           return "Board castling rights are illegal, white cannot castle queenside";
-        if (white_rights & WHITE_KINGSIDE && not_white_rooks & SQUARE_TO_BB(H1))  
+        if (white_rights & WHITE_KINGSIDE && not_white_rooks & SQUARE_TO_BB(H1))
           return "Board castling rights are illegal, white cannot castle kingside";
         bitboard_t not_black_rooks = ~(position->rooks & position->black_oc);
         if (black_rights & BLACK_QUEENSIDE && not_black_rooks & SQUARE_TO_BB(A8))
@@ -1077,7 +1077,7 @@ char* validate_board(full_board_t * board) {
 			bitboard_t on_6 = ep_bb & RANK_6;
 			if (!on_3 && !on_6) {
 				return "Board has illegal en passant square, must be on either rank 3 or rank 6";
-			}	
+			}
 			if (board->turn == WHITE_VAL) {
 					if (on_3) {
 						return "Board has illegal en passant square, must be on rank 6 if it is white's turn";
@@ -1086,14 +1086,14 @@ char* validate_board(full_board_t * board) {
 						return "Board has illegal en passant square, there is no corresponding black pawn";
 					}
 			}
-			else {	
+			else {
 					if (on_6) {
 						return "Board has illegal en passant square, must be on rank 3 if it is black's turn";
 					}
 					if (!(SAFE_ABOVE_BB(ep_bb) & white_pawns)) {
 						return "Board has illegal en passant square, there is no corresponding white pawn";
 					}
-			}	
+			}
 		}
 		if (opponent_in_check(board)){
             return "Board has impossible position, the player to move cannot be able to capture the opponent's king.";
@@ -1104,6 +1104,3 @@ char* validate_board(full_board_t * board) {
 		}
 		return 0;
 }
-
-
-
